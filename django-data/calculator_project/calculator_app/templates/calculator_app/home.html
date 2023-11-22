@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Calculadora</title>
+</head>
+<body>
+    <h1>Calculadora</h1>
+    
+    <form method="post" action="{% url 'calculate' %}">
+        {% csrf_token %}
+        <input type="text" name="num1" value="{{ num1 }}" placeholder="Número 1" required>
+        <select name="operation" required>
+            <option value="add">+</option>
+            <option value="subtract">-</option>
+            <option value="multiply">*</option>
+            <option value="divide">/</option>
+        </select>
+        <input type="text" name="num2" value="{{ num2 }}" placeholder="Número 2" required>
+        <button type="submit">Calcular</button>
+    </form>
+
+    {% if result %}
+        <p>Resultado: {{ result }}</p>
+    {% endif %}
+
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+</body>
+</html>
