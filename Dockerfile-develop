@@ -7,9 +7,6 @@ RUN apt update && apt -y upgrade && \
 RUN echo "tzdata tzdata/Areas select Europe" | debconf-set-selections && \
     echo "tzdata tzdata/Zones/Europe select Berlin" | debconf-set-selections && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata
-COPY django-init.sh /
-# ENTRYPOINT [ "./django-init.sh" ]
-# ENTRYPOINT [ "tail", "-f", "/dev/null" ]
+COPY django-init-develop.sh /
 WORKDIR /django-data
-# EXPOSE 8000
 USER root
