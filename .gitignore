@@ -1,0 +1,4 @@
+django-data/calculator_app/__pycache__/
+django-data/calculator_app/migrations/
+django-data/calculator_project/__pycache__/
+*.pyc
