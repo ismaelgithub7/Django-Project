@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  django-nginx-gunicorn:
+    container_name: Django-production
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - django-production
+    ports:
+      - 8000:80
+    volumes:
+      - ./django-data:/django-data:rwxrwxr-w
+    command: /django-init-develop.sh
+
+  postgres:
+    container_name: Django-production-postgres
+    image: postgres:16-alpine3.18
+    networks:
+      - django-production
+    environment:
+      POSTGRES_PASSWORD: pass
+      POSTGRES_USER: user
+      POSTGRES_DB: db
+
+volumes:
+  django-data:
+
+networks:
+  django-production:
+    driver: bridge

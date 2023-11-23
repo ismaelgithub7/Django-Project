@@ -2,6 +2,7 @@
 project_name="calculator_project"
 app_name="calculator_app"
 restore_djangopath=false
+
 if [ $restore_djangopath = true ];
 then
     rm -rf /django-data/*
