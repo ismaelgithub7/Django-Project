@@ -1,0 +1,11 @@
+version: '3'
+services:
+  django:
+    build: .
+    ports:
+      - 8000:8000
+    volumes:
+      - ./django-data:/django-data:rwxrwxr-w
+    command: /django-init.sh
+volumes:
+  django-data:
