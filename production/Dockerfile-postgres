@@ -1,0 +1,4 @@
+FROM postgres:16-alpine3.18
+COPY postgres-init-production.sh /
+COPY postgres-conf.sql /docker-entrypoint-initdb.d/
+USER postgres
