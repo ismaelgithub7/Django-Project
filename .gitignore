@@ -1,4 +1,5 @@
 django-data/calculator_app/__pycache__/
 django-data/calculator_app/migrations/
 django-data/calculator_project/__pycache__/
+django-data/db.sqlite3
 *.pyc
