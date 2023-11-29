@@ -5,13 +5,13 @@ services:
     container_name: Django-production
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-production
     networks:
       - django-production
     ports:
       - 8000:8000
     volumes:
-      - ./django-data:/django-data:rwxrwxr-w
+      - ../django-data:/django-data:rwxrwxr-w
     command: /django-init-production.sh
     restart: always
     depends_on:
@@ -31,12 +31,12 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - ./postgres-conf:/etc/postgresql
+      - ./postgresql-conf/:/postgresql-conf/
     command: /postgres-init-production.sh
 
 volumes:
   django-data:
-  postgres-conf:
+  postgresql-conf:
 
 networks:
   django-production:
