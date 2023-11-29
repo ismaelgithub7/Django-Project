@@ -3,25 +3,23 @@ version: '3'
 services:
   django-nginx-gunicorn:
     container_name: Django-production
-    build:
-      context: .
-      dockerfile: Dockerfile-production
+    image: ifm7/django-production:latest
     networks:
       - django-production
     ports:
       - 8000:8000
     volumes:
       - ../django-data:/django-data:rwxrwxr-w
-    command: /django-init-production.sh
+      - ./docker-data/django/:/docker-data/
+    command: /docker-data/django-init-production.sh
     restart: always
     depends_on:
       - postgres
 
   postgres:
     container_name: Django-production-postgres
-    build:
-      context: .
-      dockerfile: Dockerfile-postgres
+    # image: ifm7/django-production-pg-db
+    image: postgres:16-alpine3.18
     networks:
       - django-production
     environment:
@@ -31,8 +29,8 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - ./postgresql-conf/:/postgresql-conf/
-    command: /postgres-init-production.sh
+      - ./docker-data/postgres/:/docker-data/
+    command: /docker-data/postgres-init-production.sh
 
 volumes:
   django-data:

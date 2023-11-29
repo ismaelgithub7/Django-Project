@@ -1,14 +1,14 @@
 version: '3'
 services:
   django:
-    container_name: Django-develop
-    build:
-      context: .
-      dockerfile: Dockerfile-develop
+    container_name: django-develop
+    image: ifm7/django-develop
     ports:
       - 8000:8000
     volumes:
       - ../django-data:/django-data:rwxrwxr-w
-    command: /django-init-develop.sh
+      - ./docker-data/:/docker-data/
+    command: /docker-data/django-init-develop.sh
 volumes:
   django-data:
+  docker-data:
