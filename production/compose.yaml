@@ -14,6 +14,7 @@ services:
       - 5432
     volumes:
       - ./docker-data/postgres/:/docker-data/
+      - ./db-postgres:/var/lib/postgresql/data
     command: /docker-data/postgres-init-production.sh
   
   django:
@@ -48,6 +49,7 @@ volumes:
   django-data:
   postgresql-conf:
   nginx-conf:
+  db-postgres:
 
 networks:
   django-production:
