@@ -1,0 +1,56 @@
+version: '3'
+
+services:
+  postgres:
+    container_name: postgres-alpine-production
+    image: postgres:16-alpine3.18
+    networks:
+      - django-production
+    environment:
+      POSTGRES_PASSWORD: pass
+      POSTGRES_USER: postgres
+      POSTGRES_DB: pdb
+    ports:
+      - 5432
+    volumes:
+      - ./docker-data/postgres/:/docker-data/
+      - ./db-postgres:/var/lib/postgresql/data
+    command: /docker-data/postgres-init-production.sh
+  
+  django:
+    container_name: django-production
+    image: ifm7/django-gunicorn-production:latest
+    networks:
+      - django-production
+    ports:
+      - 8000
+    volumes:
+      - ../django-data:/django-data:rwxrwxr-w
+      - ./docker-data/django/:/docker-data/
+    command: /docker-data/django-init-production.sh
+    restart: always
+    depends_on:
+      - postgres
+
+  nginx-alpine:
+    container_name: nginx-alpine-production
+    image: ifm7/nginx-alpine
+    networks:
+      - django-production
+    ports:
+      - 80:80
+    volumes:
+      - ./docker-data/nginx/:/etc/nginx/
+    depends_on:
+      - django
+    command: nginx -g "daemon off;"
+
+volumes:
+  django-data:
+  postgresql-conf:
+  nginx-conf:
+  db-postgres:
+
+networks:
+  django-production:
+    driver: bridge
