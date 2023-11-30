@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-ql@9e*u2=1-*krfu(u@19q*ot%nl^)pgi_v)!3ja0&2wq__ly_
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "nginx-alpine-production"]
+ALLOWED_HOSTS = ["localhost", "calculator.com"]
 
 
 # Application definition
