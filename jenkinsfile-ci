@@ -1,5 +1,5 @@
 pipeline {
-    agent {develop}
+    agent develop
 
     stages {
         stage('Clonar repositorio y rama') {
