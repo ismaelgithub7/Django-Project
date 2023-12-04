@@ -41,5 +41,5 @@ pipeline {
     //         // Acciones a realizar en caso de fallo
     //         // Por ejemplo, notificar o detener el flujo de trabajo
     //     }
-    // }
+    }
 }
