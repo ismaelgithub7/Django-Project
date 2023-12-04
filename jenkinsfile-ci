@@ -13,10 +13,9 @@ pipeline {
             steps {
                 // Realizar tareas de compilación, por ejemplo, usando Maven o Gradle
                 // sh 'mvn clean install'
-                sh {
-                    "pwd
-                    ls -la"
-                }
+                sh 'pwd'
+                sh 'ls -la'
+
             }
         }
 
