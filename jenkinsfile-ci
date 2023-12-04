@@ -7,7 +7,7 @@ pipeline {
         stage('Clonar repositorio y rama') {
             steps {
                 // Clonar el repositorio desde tu sistema de control de versiones (por ejemplo, Git)
-                git branch: 'feature/jenkinsfile-ci', credentialsId: 'ismael-ssh-github', url: 'git@github.com:ismaelgithub7/portfolio-DevOps.git'
+                git branch: 'feature/jenkinsfile-ci', credentialsId: 'ismael-github', url: 'git@github.com:ismaelgithub7/portfolio-DevOps.git'
             }
         }
 
