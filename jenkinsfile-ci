@@ -9,37 +9,37 @@ pipeline {
             }
         }
 
-        stage('Compilar') {
-            steps {
-                // Realizar tareas de compilación, por ejemplo, usando Maven o Gradle
-                // sh 'mvn clean install'
-            }
-        }
+    //     stage('Compilar') {
+    //         steps {
+    //             // Realizar tareas de compilación, por ejemplo, usando Maven o Gradle
+    //             // sh 'mvn clean install'
+    //         }
+    //     }
 
-        stage('Pruebas') {
-            steps {
-                // Ejecutar pruebas automatizadas
-                // sh 'mvn test'
-            }
-        }
+    //     stage('Pruebas') {
+    //         steps {
+    //             // Ejecutar pruebas automatizadas
+    //             // sh 'mvn test'
+    //         }
+    //     }
 
-        stage('Análisis de Código') {
-            steps {
-                // Realizar análisis estático de código (puedes usar herramientas como SonarQube)
-                // sh 'sonar-scanner'
-            }
-        }
-    }
+    //     stage('Análisis de Código') {
+    //         steps {
+    //             // Realizar análisis estático de código (puedes usar herramientas como SonarQube)
+    //             // sh 'sonar-scanner'
+    //         }
+    //     }
+    // }
 
-    post {
-        success {
-            // Acciones a realizar en caso de éxito
-            // Por ejemplo, notificar o desencadenar un despliegue
-        }
+    // post {
+    //     success {
+    //         // Acciones a realizar en caso de éxito
+    //         // Por ejemplo, notificar o desencadenar un despliegue
+    //     }
 
-        failure {
-            // Acciones a realizar en caso de fallo
-            // Por ejemplo, notificar o detener el flujo de trabajo
-        }
-    }
+    //     failure {
+    //         // Acciones a realizar en caso de fallo
+    //         // Por ejemplo, notificar o detener el flujo de trabajo
+    //     }
+    // }
 }
