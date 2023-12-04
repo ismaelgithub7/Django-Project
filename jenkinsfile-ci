@@ -2,19 +2,20 @@ pipeline {
     agent any
 
     stages {
-        stage('Clonar Repositorio') {
+        stage('Clonar repositorio y rama') {
             steps {
                 // Clonar el repositorio desde tu sistema de control de versiones (por ejemplo, Git)
-                git branch: 'develop', credentialsId: 'ismael-ssh-github', url: 'git@github.com:ismaelgithub7/portfolio-DevOps.git'
+                git branch: 'feature/jenkinsfile-ci', credentialsId: 'ismael-ssh-github', url: 'git@github.com:ismaelgithub7/portfolio-DevOps.git'
             }
         }
 
-        stage('Comprobar rama') {
+        stage('Comprobar software necesario') {
             steps {
                 // Realizar tareas de compilación, por ejemplo, usando Maven o Gradle
                 // sh 'mvn clean install'
                 sh 'pwd'
                 sh 'ls -la'
+                sh 'docker version'
 
             }
         }
