@@ -2,17 +2,20 @@ pipeline {
     agent {
         label 'develop'
     }
-
+    environment {
+        REPO = 'git@github.com:ismaelgithub7/portfolio-DevOps.git'
+        RAMA = 'feature/jenkinsfile-ci'
+        WORKSPACE = 'django-project develop'
+    }
     stages {
-        stage('Clonar repositorio y rama') {
+        stage('Clonar Repositorio/Rama') {
             steps {
-                git branch: 'feature/jenkinsfile-ci', credentialsId: 'ismael-github', url: 'git@github.com:ismaelgithub7/portfolio-DevOps.git'
+                git branch: '${RAMA}', credentialsId: 'ismael-github', url: '${REPO}'
             }
         }
 
         stage('Comprobar software necesario') {
             steps {
-                sh 'pwd'
                 sh 'docker version > /dev/null'
                 sh 'docker compose version > /dev/null'
             }
@@ -47,7 +50,7 @@ pipeline {
     post {
         success {
             sh 'docker compose -f ./develop/compose-develop.yaml down'
-            sh "sudo chown -R jenkins /opt/jenkins/workspace/'django-project develop'"
+            sh "sudo chown -R jenkins /opt/jenkins/workspace/'${WORKSPACE}'"
         }
 
         failure {
