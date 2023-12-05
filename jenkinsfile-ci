@@ -41,13 +41,20 @@ pipeline {
 
         stage('Levantar Dockers Producción') {
             steps {
-                sh 'docker compose -f ./production/compose.yaml up -d'
+                sh 'docker compose -f ./production/compose.yaml up -d postgres'
+                sh 'docker stop postgres-alpine-production'
+                sh 'docker container update --publish-add 5432:5432 postgres-alpine-production'
+                sh 'docker start postgres-alpine-production'
+                sh 'docker compose -f ./production/compose.yaml up -d django'
+                sh 'docker compose -f ./production/compose.yaml up -d nginx-alpine'
+                sh './production/docker-data/django/wait-for-it.sh localhost:5432'
             }
         }
 
         stage('Comprobar Estado Dockers Producción') {
             steps {
-                sh './production/docker-data/django/wait-for-it.sh localhost:80'
+                // sh './production/docker-data/django/wait-for-it.sh localhost:80'
+                sh 'curl -I http://localhost:80'
             }
             post {
                 success {
