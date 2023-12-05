@@ -42,7 +42,7 @@ pipeline {
         stage('Levantar Dockers Producción') {
             steps {
                 sh 'docker compose -f ./production/compose.yaml up -d'
-                sh 'wait 10'
+                sh 'sleep 10'
             }
         }
 
