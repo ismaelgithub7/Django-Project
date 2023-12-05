@@ -23,7 +23,7 @@ pipeline {
 
         stage('Ejecutar Tests') {
             steps {
-                sh 'docker compose -f ./develop/compose-develop.yaml up'
+                sh 'docker compose -f ./develop/compose-develop.yaml up -d'
                 sh "sleep 5"
                 sh 'docker exec django-develop python3 manage.py test'
             }
