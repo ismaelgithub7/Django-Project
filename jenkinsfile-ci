@@ -1,11 +1,11 @@
 pipeline {
     agent {
-        label 'production'
+        label 'develop'
     }
     environment {
         REPO = 'git@github.com:ismaelgithub7/portfolio-DevOps.git'
         RAMA = 'feature/jenkinsfile-ci'
-        WORKSPACE = 'django-project develop'
+        WORKSPACE = '"django-project develop"'
     }
     stages {
         stage('Clonar Repositorio/Rama') {
