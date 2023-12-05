@@ -42,17 +42,17 @@ pipeline {
                 sh 'python manage.py test'
             }
         }
-    // }
+    }
 
-    // post {
-    //     success {
-    //         // Acciones a realizar en caso de éxito
-    //         // Por ejemplo, notificar o desencadenar un despliegue
-    //     }
+    post {
+        success {
+            sh 'docker compose -f ./develop/compose-develop.yaml down'
+            sh 'sudo rm -rf /opt/jenkins/workspace/django-project\ develop '
+        }
 
-    //     failure {
-    //         // Acciones a realizar en caso de fallo
-    //         // Por ejemplo, notificar o detener el flujo de trabajo
-    //     }
+        failure {
+            sh 'docker compose -f ./develop/compose-develop.yaml down'
+            sh 'sudo rm -rf /opt/jenkins/workspace/django-project\ develop '
+        }
     }
 }
