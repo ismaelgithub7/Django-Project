@@ -47,16 +47,17 @@ pipeline {
 
         stage('Comprobar Estado Dockers Producción') {
             steps {
-                 script {
-                    try {
-                        sh './production/docker-data/django/wait-for-it.sh localhost:80'
-                    } 
-                    catch (Exception e) {
-                        currentBuild.result = 'FAILURE'
-                        error("${e.message}")
-                    }
-                 }   
-                
+                sh './production/docker-data/django/wait-for-it.sh localhost:80'
+            }
+            posts {
+                success {
+                    echo '[SUCCSESS] Dockers operativos y listos!!'
+                    sh 'docker compose -f ./production/compose.yaml down'
+                }
+                failure {
+                    echo '[ERROR] Ha habido un fallo en la ejecución de los contenedores.'
+                    sh 'docker compose -f ./production/compose.yaml down'
+                }
             }
         }
         
