@@ -49,7 +49,7 @@ pipeline {
             steps {
                  script {
                     try {
-                        sh './production/docker-data/django/wait-for-it localhost'
+                        sh './production/docker-data/django/wait-for-it.sh localhost'
                     } 
                     catch (Exception e) {
                         currentBuild.result = 'FAILURE'
