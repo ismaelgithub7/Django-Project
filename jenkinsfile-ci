@@ -47,7 +47,7 @@ pipeline {
     post {
         success {
             sh 'docker compose -f ./develop/compose-develop.yaml down'
-            sh 'sudo rm -rf /opt/jenkins/workspace/django-project\ develop '
+            sh 'sudo rm -rf /opt/jenkins/workspace/"django-project develop"'
         }
 
         failure {
