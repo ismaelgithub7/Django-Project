@@ -14,47 +14,56 @@ pipeline {
             }
         }
 
-        stage('Comprobar software necesario') {
+        stage('Comprobar Software Necesario') {
             steps {
                 sh 'docker version > /dev/null'
                 sh 'docker compose version > /dev/null'
             }
         }
 
-        stage('Levantar Docker Develop') {
-            steps {
-                sh 'docker compose -f ./develop/compose-develop.yaml up -d'
-                sh "sleep 5"
-            }
-        }
-
-        stage('Comprobar Acceso Contenedor') {
-            steps {
-                sh 'docker exec django-develop pwd'
-            }
-        }
-
-        stage('Comprobar Estado Web') {
-            steps {
-                sh 'curl -I http://localhost:8000'
-            }
-        }
-        
         stage('Ejecutar Tests') {
             steps {
+                sh 'docker compose -f ./develop/compose-develop.yaml up'
+                sh "sleep 5"
                 sh 'docker exec django-develop python3 manage.py test'
             }
+            post {
+                success {
+                    echo '[SUCCESS] Tests Correctos' 
+                    sh 'docker compose -f ./develop/compose-develop.yaml down'
+                }
+                failure {
+                    error 'Tests no pasados con éxito.'
+                    sh 'docker compose -f ./develop/compose-develop.yaml down'
+                }
+            }
         }
+
+        // stage('Levantar Dockers Producción') {
+        //     steps {
+                
+        //     }
+        // }
+
+        // stage('Comprobar ') {
+        //     steps {
+
+        //     }
+        // }
+        
+        // stage('Ejecutar Tests') {
+        //     steps {
+
+        //     }
+        // }
     }
 
     post {
         success {
-            sh 'docker compose -f ./develop/compose-develop.yaml down'
             sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
         }
 
         failure {
-            sh 'docker compose -f ./develop/compose-develop.yaml down'
             sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
         }
     }
