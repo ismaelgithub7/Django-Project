@@ -6,36 +6,43 @@ pipeline {
     stages {
         stage('Clonar repositorio y rama') {
             steps {
-                // Clonar el repositorio desde tu sistema de control de versiones (por ejemplo, Git)
                 git branch: 'feature/jenkinsfile-ci', credentialsId: 'ismael-github', url: 'git@github.com:ismaelgithub7/portfolio-DevOps.git'
             }
         }
 
         stage('Comprobar software necesario') {
             steps {
-                // Realizar tareas de compilación, por ejemplo, usando Maven o Gradle
-                // sh 'mvn clean install'
                 sh 'pwd'
-                sh 'docker version'
-                sh 'docker compose version'
-
+                sh 'docker version > /dev/null'
+                sh 'docker compose version > /dev/null'
             }
         }
 
-    //     stage('Pruebas') {
-    //         steps {
-    //             // Ejecutar pruebas automatizadas
-    //             // sh 'mvn test'
-    //         }
-    //     }
+        stage('Levantar Docker Develop') {
+            steps {
+                sh 'docker compose -f ./develop/compose-develop.yaml up -d'
+                sh "sleep 5"
+            }
+        }
 
-    //     stage('Análisis de Código') {
-    //         steps {
-    //             // Realizar análisis estático de código (puedes usar herramientas como SonarQube)
-    //             // sh 'sonar-scanner'
-    //         }
-    //     }
-    // }
+        stage('Comprobar Acceso Contenedor') {
+            steps {
+                sh 'docker exec -it django-develop python3 version'
+            }
+        }
+
+        stage('Comprobar Estado Web') {
+            steps {
+                sh 'curl -I http://localhost:8000'
+            }
+        }
+        
+        stage('Ejecutar Tests') {
+            steps {
+                sh 'python manage.py test'
+            }
+        }
+    }
 
     // post {
     //     success {
