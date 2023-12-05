@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('Clonar Repositorio/Rama') {
             steps {
-                git branch: '${RAMA}', credentialsId: 'ismael-github', url: '${REPO}'
+                git branch: ${RAMA}, credentialsId: 'ismael-github', url: ${REPO}
             }
         }
 
@@ -50,7 +50,7 @@ pipeline {
     post {
         success {
             sh 'docker compose -f ./develop/compose-develop.yaml down'
-            sh "sudo chown -R jenkins /opt/jenkins/workspace/'${WORKSPACE}'"
+            sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
         }
 
         failure {
