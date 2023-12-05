@@ -57,10 +57,10 @@ pipeline {
             post {
                 success {
                     echo '[SUCCSESS] Dockers operativos y listos!!'
-                    sh 'docker compose -f ./production/compose.yaml down'
                     sh 'docker logs postgres-alpine-production'
                     sh 'docker logs django-production'
                     sh 'docker logs nginx-alpine-production'
+                    sh 'docker compose -f ./production/compose.yaml down'
                 }
                 failure {
                     sh 'docker logs postgres-alpine-production'
