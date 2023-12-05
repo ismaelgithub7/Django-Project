@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        label 'develop'
+        label 'production'
     }
     environment {
         REPO = 'git@github.com:ismaelgithub7/portfolio-DevOps.git'
@@ -55,7 +55,7 @@ pipeline {
 
         failure {
             sh 'docker compose -f ./develop/compose-develop.yaml down'
-            sh "sudo chown -R jenkins /opt/jenkins/workspace/'django-project develop'"
+            sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
         }
     }
 }
