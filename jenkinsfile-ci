@@ -49,7 +49,7 @@ pipeline {
             steps {
                 sh './production/docker-data/django/wait-for-it.sh localhost:80'
             }
-            posts {
+            post {
                 success {
                     echo '[SUCCSESS] Dockers operativos y listos!!'
                     sh 'docker compose -f ./production/compose.yaml down'
