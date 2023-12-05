@@ -50,10 +50,12 @@ pipeline {
                  script {
                     try {
                         sh './production/docker-data/django/wait-for-it localhost'
-                    } catch (Exception e) {
+                    } 
+                    catch (Exception e) {
                         currentBuild.result = 'FAILURE'
                         error("${e.message}")
-                }
+                    }
+                 }   
                 
             }
         }
