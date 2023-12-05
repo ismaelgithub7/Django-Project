@@ -6,6 +6,7 @@ pipeline {
         REPO = 'git@github.com:ismaelgithub7/portfolio-DevOps.git'
         RAMA = 'feature/jenkinsfile-ci'
         WORKSPACE = '"django-project develop"'
+        TIME_SLEEP = '10'
     }
     stages {
         stage('Clonar Repositorio/Rama') {
@@ -42,7 +43,7 @@ pipeline {
         stage('Levantar Dockers Producción') {
             steps {
                 sh 'docker compose -f ./production/compose.yaml up -d'
-                sh 'sleep 10'
+                sh "sleep ${TIME_SLEEP}"
             }
         }
 
@@ -71,12 +72,6 @@ pipeline {
                 }
             }
         }
-        
-        // stage('Ejecutar Tests') {
-        //     steps {
-
-        //     }
-        // }
     }
 
     post {
