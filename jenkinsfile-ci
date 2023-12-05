@@ -27,7 +27,7 @@ pipeline {
 
         stage('Comprobar Acceso Contenedor') {
             steps {
-                sh 'docker exec django-develop python3 version'
+                sh 'docker exec django-develop pwd'
             }
         }
 
