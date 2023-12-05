@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('Clonar Repositorio/Rama') {
             steps {
-                git branch: ${RAMA}, credentialsId: 'ismael-github', url: ${REPO}
+                git branch: "${RAMA}", credentialsId: 'ismael-github', url: "${REPO}"
             }
         }
 
