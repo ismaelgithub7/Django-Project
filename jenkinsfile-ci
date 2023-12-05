@@ -42,7 +42,7 @@ pipeline {
                 sh 'python manage.py test'
             }
         }
-    }
+    // }
 
     // post {
     //     success {
