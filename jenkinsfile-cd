@@ -60,10 +60,7 @@ pipeline {
             post {
                 success {
                     echo '[SUCCESS] Dockers Nuevos Levantados con Éxito.'
-                    sh "if [ -d '/opt/jenkins/workspace/${WORKSPACE}-old' ];
-                        then
-                            rm -rf /opt/jenkins/workspace/${WORKSPACE}-old
-                        fi"
+                    sh "if [ -d '/opt/jenkins/workspace/${WORKSPACE}-old' ]; then rm -rf /opt/jenkins/workspace/${WORKSPACE}-old fi"
                 }
                 failure {
                     echo '[FAIL] Hubo un problema se restaurarán los dockers anteriores.'
