@@ -50,7 +50,7 @@ pipeline {
                     sh 'docker exec django-production pwd'
                     sh 'docker exec nginx-alpine-production pwd'
                 }
-                catch {
+                catch (Exception e) {
                     echo '[INFO] Dockers no encontrados en Producción.'
                 }
                 finally {
