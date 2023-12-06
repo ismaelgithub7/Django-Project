@@ -83,7 +83,7 @@ pipeline {
 
         failure {
             sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
-            emailext attachLog: true,body: 'Logs adjuntados.', subject: "[FAIL] La ejecución de CI de ${RAMA} ha fallado.", to: "${EMAIL}"
+            emailext attachLog: true, body: 'Logs adjuntados.', subject: "[FAIL] La ejecución de CI de ${RAMA} ha fallado.", to: "${EMAIL}"
         }
     }
 }
