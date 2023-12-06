@@ -1,0 +1,95 @@
+pipeline {
+    agent {
+        label 'production'
+    }
+    environment {
+        REPO = 'git@github.com:ismaelgithub7/portfolio-DevOps.git'
+        RAMA = 'feature/jenkinsfile-cd'
+        WORKSPACE = 'django-project-production'
+        TIME_SLEEP = '10'
+        EMAIL = 'ismaelfernandezmendezfp@gmail.com'
+    }
+    stages {
+
+        stage('Comprobar Software Necesario') {
+            steps {
+                sh 'docker version > /dev/null'
+                sh 'docker compose version > /dev/null'
+            }
+        }
+
+        stage('Comprobar Estado Dockers Ya en Producción') {
+            steps {    
+                script {    
+                    try {
+                        sh 'curl -I http://localhost:80'
+                        sh 'docker exec postgres-alpine-production pwd'
+                        sh 'docker exec django-production pwd'
+                        sh 'docker exec nginx-alpine-production pwd'
+
+                        echo '[INFO] Se bajarán los dockers activos para levantar los nuevos'
+                        sh 'docker compose -f ./production/compose.yaml down'
+                        sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
+                        sh "cp  -R /opt/jenkins/workspace/${WORKSPACE} /opt/jenkins/workspace/${WORKSPACE}-old"
+                        sh "rm -rf /opt/jenkins/workspace/${WORKSPACE}/*"
+                        git branch: "${RAMA}", credentialsId: 'ismael-github', url: "${REPO}"
+                    }
+                    catch (Exception e) {
+                        echo '[INFO] Dockers no encontrados en Producción.'
+                    }
+                }
+            }
+        }
+
+        stage('Levantar Dockers Producción') {
+            steps {
+                script {
+                    try {
+                        sh 'docker compose -f ./production/compose.yaml up -d'
+                        sh "sleep ${TIME_SLEEP}"
+                    }
+                    catch (Exception e){
+                        echo 'Ha habido un problema al intentar levantar los dockers.'
+                    }
+                }
+            }
+        }
+
+        stage('Comprobar Estado Dockers Acabados de Levantar') {
+            steps {
+                script {
+                    try {
+                        sh 'curl -I http://localhost:80'
+                        sh 'docker exec postgres-alpine-production pwd'
+                        sh 'docker exec django-production pwd'
+                        sh 'docker exec nginx-alpine-production pwd'
+
+                        echo '[SUCCESS] Dockers Nuevos Levantados con Éxito.'
+                        sh "if [ -d '/opt/jenkins/workspace/${WORKSPACE}-old' ]; then rm -rf /opt/jenkins/workspace/${WORKSPACE}-old; else echo 'no existe'; fi"
+                    }
+                    catch (Exception e){
+                        echo '[FAIL] Hubo un problema se restaurarán los dockers anteriores si existían.'
+                        sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
+                        sh "rm -rf /opt/jenkins/workspace/${WORKSPACE}"
+                        sh "mv /opt/jenkins/workspace/${WORKSPACE}-old /opt/jenkins/workspace/${WORKSPACE}"
+                        sh "if [ -d '/opt/jenkins/workspace/${WORKSPACE}-old' ]; then mv /opt/jenkins/workspace/${WORKSPACE}-old /opt/jenkins/workspace/${WORKSPACE} && docker compose -f ./production/compose.yaml up -d; fi"
+                        error 'Hubo un problema con los dockers nuevos.'
+                    }
+                }
+
+            }
+        }
+    }
+
+    post {
+        success {
+            sh "if [ -d '/opt/jenkins/workspace/${WORKSPACE}-old' ]; then rm -rf /opt/jenkins/workspace/${WORKSPACE}-old; else echo 'no existe'; fi"
+            emailext attachLog: true, body: 'Logs adjuntados.', subject: "[SUCCESS] La ejecución de CI de ${RAMA} ha sido realizada con éxito.", to: "${EMAIL}"
+        }
+
+        failure {
+            sh "if [ -d '/opt/jenkins/workspace/${WORKSPACE}-old' ]; then rm -rf /opt/jenkins/workspace/${WORKSPACE}-old; else echo 'no existe'; fi"
+            emailext attachLog: true, body: 'Logs adjuntados.', subject: "[FAIL] La ejecución de CI de ${RAMA} ha fallado.", to: "${EMAIL}"
+        }
+    }
+}
