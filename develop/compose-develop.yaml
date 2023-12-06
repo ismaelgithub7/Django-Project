@@ -4,11 +4,11 @@ services:
     container_name: django-develop
     image: ifm7/django-develop
     ports:
-      - 8000:8000
+      - 8000:8000 # Bindeo puerto 8000 host a 8000 docker.
     volumes:
-      - ../django-data:/django-data:rwxrwxr-w
-      - ./docker-data/:/docker-data/
-    command: /docker-data/django-init-develop.sh
+      - ../django-data:/django-data/ # Se introduce el código de Django.
+      - ./docker-data/:/docker-data/ # Se introduce script de inicialización.
+    command: /docker-data/django-init-develop.sh # Se inicia el Docker ejecutando el script de inicialización.
 volumes:
   django-data:
   docker-data:
