@@ -1,0 +1,89 @@
+pipeline {
+    agent {
+        label 'develop'
+    }
+    environment {
+        REPO = 'git@github.com:ismaelgithub7/portfolio-DevOps.git'
+        RAMA = 'develop'
+        WORKSPACE = '"django-project develop"'
+        TIME_SLEEP = '10'
+        EMAIL = 'ismaelfernandezmendezfp@gmail.com'
+    }
+    stages {
+        stage('Clonar Repositorio/Rama') {
+            steps {
+                git branch: "${RAMA}", credentialsId: 'ismael-github', url: "${REPO}"
+            }
+        }
+
+        stage('Comprobar Software Necesario') {
+            steps {
+                sh 'docker version > /dev/null'
+                sh 'docker compose version > /dev/null'
+            }
+        }
+
+        stage('Ejecutar Tests') {
+            steps {
+                sh 'docker compose -f ./develop/compose-develop.yaml up -d'
+                sh "sleep 5"
+                sh 'docker exec django-develop python3 manage.py test'
+            }
+            post {
+                success {
+                    echo '[SUCCESS] Tests Correctos' 
+                    sh 'docker compose -f ./develop/compose-develop.yaml down'
+                }
+                failure {
+                    error 'Tests no pasados con éxito.'
+                    sh 'docker compose -f ./develop/compose-develop.yaml down'
+                }
+            }
+        }
+
+        stage('Levantar Dockers Producción') {
+            steps {
+                sh 'docker compose -f ./production/compose.yaml up -d'
+                sh "sleep ${TIME_SLEEP}"
+            }
+        }
+
+        stage('Comprobar Estado Dockers Producción') {
+            steps {
+                sh 'curl -I http://localhost:80'
+                sh 'docker exec postgres-alpine-production pwd'
+                sh 'docker exec django-production pwd'
+                sh 'docker exec nginx-alpine-production pwd'
+                echo 'LOGS: '
+            }
+            post {
+                success {
+                    echo '[SUCCSESS] Dockers operativos y listos!!'
+                    sh 'docker logs postgres-alpine-production'
+                    sh 'docker logs django-production'
+                    sh 'docker logs nginx-alpine-production'
+                    sh 'docker compose -f ./production/compose.yaml down'
+                }
+                failure {
+                    sh 'docker logs postgres-alpine-production'
+                    sh 'docker logs django-production'
+                    sh 'docker logs nginx-alpine-production'
+                    sh 'docker compose -f ./production/compose.yaml down'
+                    error '[ERROR] Ha habido un fallo en la ejecución de los contenedores.'
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
+            emailext attachLog: true, body: 'Logs adjuntados.', subject: "[SUCCESS] La ejecución de CI de ${RAMA} ha sido realizada con éxito.", to: "${EMAIL}"
+        }
+
+        failure {
+            sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
+            emailext attachLog: true, body: 'Logs adjuntados.', subject: "[FAIL] La ejecución de CI de ${RAMA} ha fallado.", to: "${EMAIL}"
+        }
+    }
+}
