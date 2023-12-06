@@ -23,46 +23,46 @@ pipeline {
             }
         }
 
-        // stage('Comprobar Estado Dockers Ya en Producción') {
-        //     steps {
-        //         sh 'curl -I http://localhost:80'
-        //         sh 'docker exec postgres-alpine-production pwd'
-        //         sh 'docker exec django-production pwd'
-        //         sh 'docker exec nginx-alpine-production pwd'
-        //     }
-        //     post {
-        //         success {
-        //             echo '[INFO] Se bajarán los dockers activos para levantar los nuevos'
-        //             sh 'docker compose -f ./production/compose.yaml down'
-        //             sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
-        //             sh "mv /opt/jenkins/workspace/${WORKSPACE} /opt/jenkins/workspace/${WORKSPACE}-old"
-        //         }
-        //         failure {
-        //             echo '[INFO] Dockers no encontrados en Producción.'
-        //         }
-        //     }
-        // }
         stage('Comprobar Estado Dockers Ya en Producción') {
-            steps {    
-                script {    
-                    try {
-                        sh 'curl -I http://localhost:80'
-                        sh 'docker exec postgres-alpine-production pwd'
-                        sh 'docker exec django-production pwd'
-                        sh 'docker exec nginx-alpine-production pwd'
-                    }
-                    catch (Exception e) {
-                        echo '[INFO] Dockers no encontrados en Producción.'
-                    }
-                    finally {
-                        echo '[INFO] Se bajarán los dockers activos para levantar los nuevos'
-                        sh 'docker compose -f ./production/compose.yaml down'
-                        sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
-                        sh "mv /opt/jenkins/workspace/${WORKSPACE} /opt/jenkins/workspace/${WORKSPACE}-old"
-                    }
+            steps {
+                sh 'curl -I http://localhost:80'
+                sh 'docker exec postgres-alpine-production pwd'
+                sh 'docker exec django-production pwd'
+                sh 'docker exec nginx-alpine-production pwd'
+            }
+            post {
+                success {
+                    echo '[INFO] Se bajarán los dockers activos para levantar los nuevos'
+                    sh 'docker compose -f ./production/compose.yaml down'
+                    sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
+                    sh "mv /opt/jenkins/workspace/${WORKSPACE} /opt/jenkins/workspace/${WORKSPACE}-old"
+                }
+                failure {
+                    echo '[INFO] Dockers no encontrados en Producción.'
                 }
             }
         }
+        // stage('Comprobar Estado Dockers Ya en Producción') {
+        //     steps {    
+        //         script {    
+        //             try {
+        //                 sh 'curl -I http://localhost:80'
+        //                 sh 'docker exec postgres-alpine-production pwd'
+        //                 sh 'docker exec django-production pwd'
+        //                 sh 'docker exec nginx-alpine-production pwd'
+        //             }
+        //             catch (Exception e) {
+        //                 echo '[INFO] Dockers no encontrados en Producción.'
+        //             }
+        //             finally {
+        //                 echo '[INFO] Se bajarán los dockers activos para levantar los nuevos'
+        //                 sh 'docker compose -f ./production/compose.yaml down'
+        //                 sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
+        //                 sh "mv /opt/jenkins/workspace/${WORKSPACE} /opt/jenkins/workspace/${WORKSPACE}-old"
+        //             }
+        //         }
+        //     }
+        // }
 
         stage('Levantar Dockers Producción') {
             steps {
