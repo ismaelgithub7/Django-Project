@@ -1,0 +1,92 @@
+pipeline {
+    agent {
+        label 'production'
+    }
+    environment {
+        REPO = 'git@github.com:ismaelgithub7/portfolio-DevOps.git'
+        RAMA = 'feature/jenkinsfile-cd'
+        WORKSPACE = '"django-project develop"'
+        TIME_SLEEP = '10'
+        EMAIL = 'ismaelfernandezmendezfp@gmail.com'
+    }
+    stages {
+        stage('Clonar Repositorio/Rama') {
+            steps {
+                git branch: "${RAMA}", credentialsId: 'ismael-github', url: "${REPO}"
+            }
+        }
+
+        stage('Comprobar Software Necesario') {
+            steps {
+                sh 'docker version > /dev/null'
+                sh 'docker compose version > /dev/null'
+            }
+        }
+
+        stage('Comprobar Estado Dockers Ya en Producción') {
+            steps {
+                sh 'curl -I http://localhost:80'
+                sh 'docker exec postgres-alpine-production pwd'
+                sh 'docker exec django-production pwd'
+                sh 'docker exec nginx-alpine-production pwd'
+            }
+            post {
+                success {
+                    echo '[INFO] Se bajarán los dockers activos para levantar los nuevos'
+                    sh 'docker compose -f ./production/compose.yaml down'
+                    sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
+                    sh "mv /opt/jenkins/workspace/${WORKSPACE} /opt/jenkins/workspace/${WORKSPACE}-old"
+                }
+                failure {
+                    echo '[INFO] Dockers no encontrados en Producción.'
+                }
+            }
+        }
+
+        stage('Levantar Dockers Producción') {
+            steps {
+                sh 'docker compose -f ./production/compose.yaml up -d'
+                sh "sleep ${TIME_SLEEP}"
+            }
+        }
+
+        stage('Comprobar Estado Dockers Acabados de Levantar') {
+            steps {
+                sh 'curl -I http://localhost:80'
+                sh 'docker exec postgres-alpine-production pwd'
+                sh 'docker exec django-production pwd'
+                sh 'docker exec nginx-alpine-production pwd'
+            }
+            post {
+                success {
+                    echo '[SUCCESS] Dockers Nuevos Levantados con Éxito.'
+                    sh "if [ -d '/opt/jenkins/workspace/${WORKSPACE}-old' ];
+                        then
+                            rm -rf /opt/jenkins/workspace/${WORKSPACE}-old
+                        fi"
+                }
+                failure {
+                    echo '[FAIL] Hubo un problema se restaurarán los dockers anteriores.'
+                    sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
+                    sh "rm -rf /opt/jenkins/workspace/${WORKSPACE}"
+                    sh "mv /opt/jenkins/workspace/${WORKSPACE}-old /opt/jenkins/workspace/${WORKSPACE}"
+                    sh 'docker compose -f ./production/compose.yaml up -d'
+                    error 'Hubo un problema con los dockers nuevos.'
+                    
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
+            emailext attachLog: true, body: 'Logs adjuntados.', subject: "[SUCCESS] La ejecución de CI de ${RAMA} ha sido realizada con éxito.", to: "${EMAIL}"
+        }
+
+        failure {
+            sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
+            emailext attachLog: true, body: 'Logs adjuntados.', subject: "[FAIL] La ejecución de CI de ${RAMA} ha fallado.", to: "${EMAIL}"
+        }
+    }
+}
