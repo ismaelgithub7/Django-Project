@@ -77,10 +77,12 @@ pipeline {
     post {
         success {
             sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
+            emailext body: 'Logs adjuntados.', subject: "[SUCCESS] La ejecución de CI de ${RAMA} ha sido realizada con éxito.", to: 'ismaelfernandezmendezfp@gmail.com'
         }
 
         failure {
             sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
+            emailext body: 'Logs adjuntados.', subject: '[FAIL] La ejecución de CI de ${RAMA} ha fallado.', to: 'ismaelfernandezmendezfp@gmail.com'
         }
     }
 }
