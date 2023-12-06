@@ -4,7 +4,7 @@ pipeline {
     }
     environment {
         REPO = 'git@github.com:ismaelgithub7/portfolio-DevOps.git'
-        RAMA = 'develop'
+        RAMA = 'bugfix/logs-ejec'
         WORKSPACE = '"django-project develop"'
         TIME_SLEEP = '10'
         EMAIL = 'ismaelfernandezmendezfp@gmail.com'
@@ -78,12 +78,12 @@ pipeline {
     post {
         success {
             sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
-            emailext body: 'Logs adjuntados.', subject: "[SUCCESS] La ejecución de CI de ${RAMA} ha sido realizada con éxito.", to: "${EMAIL}"
+            emailext attachLog: true, body: 'Logs adjuntados.', subject: "[SUCCESS] La ejecución de CI de ${RAMA} ha sido realizada con éxito.", to: "${EMAIL}"
         }
 
         failure {
             sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
-            emailext body: 'Logs adjuntados.', subject: "[SUCCESS] La ejecución de CI de ${RAMA} ha sido realizada con éxito.", to: "${EMAIL}"
+            emailext attachLog: true, body: 'Logs adjuntados.', subject: "[FAIL] La ejecución de CI de ${RAMA} ha fallado.", to: "${EMAIL}"
         }
     }
 }
