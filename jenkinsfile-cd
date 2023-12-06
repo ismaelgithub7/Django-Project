@@ -93,11 +93,11 @@ pipeline {
                     sh "if [ -d '/opt/jenkins/workspace/${WORKSPACE}-old' ]; then rm -rf /opt/jenkins/workspace/${WORKSPACE}-old; fi"
                 }
                 failure {
-                    echo '[FAIL] Hubo un problema se restaurarán los dockers anteriores.'
+                    echo '[FAIL] Hubo un problema se restaurarán los dockers anteriores si existían.'
                     sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
                     sh "rm -rf /opt/jenkins/workspace/${WORKSPACE}"
                     sh "mv /opt/jenkins/workspace/${WORKSPACE}-old /opt/jenkins/workspace/${WORKSPACE}"
-                    sh 'docker compose -f ./production/compose.yaml up -d'
+                    sh "if [ -d '/opt/jenkins/workspace/${WORKSPACE}-old' ]; then mv /opt/jenkins/workspace/${WORKSPACE}-old /opt/jenkins/workspace/${WORKSPACE} && docker compose -f ./production/compose.yaml up -d; fi"
                     error 'Hubo un problema con los dockers nuevos.'
                     
                 }
@@ -108,7 +108,12 @@ pipeline {
     post {
         success {
             // sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
-            sh "if [ -d '/opt/jenkins/workspace/${WORKSPACE}-old' ]; then rm -rf /opt/jenkins/workspace/${WORKSPACE}-old; fi"
+            sh "if [ -d '/opt/jenkins/workspace/${WORKSPACE}-old' ]; 
+                then 
+                    rm -rf /opt/jenkins/workspace/${WORKSPACE}-old
+                else
+                    echo 'no existe'
+                fi"
             emailext attachLog: true, body: 'Logs adjuntados.', subject: "[SUCCESS] La ejecución de CI de ${RAMA} ha sido realizada con éxito.", to: "${EMAIL}"
         }
 
