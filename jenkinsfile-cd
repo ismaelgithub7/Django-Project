@@ -10,11 +10,11 @@ pipeline {
         EMAIL = 'ismaelfernandezmendezfp@gmail.com'
     }
     stages {
-        stage('Clonar Repositorio/Rama') {
-            steps {
-                git branch: "${RAMA}", credentialsId: 'ismael-github', url: "${REPO}"
-            }
-        }
+        // stage('Clonar Repositorio/Rama') {
+        //     steps {
+        //         git branch: "${RAMA}", credentialsId: 'ismael-github', url: "${REPO}"
+        //     }
+        // }
 
         stage('Comprobar Software Necesario') {
             steps {
@@ -23,46 +23,55 @@ pipeline {
             }
         }
 
-        stage('Comprobar Estado Dockers Ya en Producción') {
-            steps {
-                sh 'curl -I http://localhost:80'
-                sh 'docker exec postgres-alpine-production pwd'
-                sh 'docker exec django-production pwd'
-                sh 'docker exec nginx-alpine-production pwd'
-            }
-            post {
-                success {
-                    echo '[INFO] Se bajarán los dockers activos para levantar los nuevos'
-                    sh 'docker compose -f ./production/compose.yaml down'
-                    sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
-                    sh "mv /opt/jenkins/workspace/${WORKSPACE} /opt/jenkins/workspace/${WORKSPACE}-old"
-                }
-                failure {
-                    echo '[INFO] Dockers no encontrados en Producción.'
-                }
-            }
-        }
         // stage('Comprobar Estado Dockers Ya en Producción') {
-        //     steps {    
-        //         script {    
-        //             try {
-        //                 sh 'curl -I http://localhost:80'
-        //                 sh 'docker exec postgres-alpine-production pwd'
-        //                 sh 'docker exec django-production pwd'
-        //                 sh 'docker exec nginx-alpine-production pwd'
-        //             }
-        //             catch (Exception e) {
-        //                 echo '[INFO] Dockers no encontrados en Producción.'
-        //             }
-        //             finally {
-        //                 echo '[INFO] Se bajarán los dockers activos para levantar los nuevos'
-        //                 sh 'docker compose -f ./production/compose.yaml down'
-        //                 sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
-        //                 sh "mv /opt/jenkins/workspace/${WORKSPACE} /opt/jenkins/workspace/${WORKSPACE}-old"
-        //             }
+        //     steps {
+        //         sh 'curl -I http://localhost:80'
+        //         sh 'docker exec postgres-alpine-production pwd'
+        //         sh 'docker exec django-production pwd'
+        //         sh 'docker exec nginx-alpine-production pwd'
+        //     }
+        //     post {
+        //         success {
+        //             echo '[INFO] Se bajarán los dockers activos para levantar los nuevos'
+        //             sh 'docker compose -f ./production/compose.yaml down'
+        //             sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
+        //             sh "mv /opt/jenkins/workspace/${WORKSPACE} /opt/jenkins/workspace/${WORKSPACE}-old"
+        //         }
+        //         failure {
+        //             echo '[INFO] Dockers no encontrados en Producción.'
         //         }
         //     }
         // }
+        stage('Comprobar Estado Dockers Ya en Producción') {
+            steps {    
+                script {    
+                    try {
+                        sh 'curl -I http://localhost:80'
+                        sh 'docker exec postgres-alpine-production pwd'
+                        sh 'docker exec django-production pwd'
+                        sh 'docker exec nginx-alpine-production pwd'
+
+                        echo '[INFO] Se bajarán los dockers activos para levantar los nuevos'
+                        sh 'docker compose -f ./production/compose.yaml down'
+                        sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
+                        sh "cp /opt/jenkins/workspace/${WORKSPACE} /opt/jenkins/workspace/${WORKSPACE}-old"
+                        sh "rm -rf /opt/jenkins/workspace/${WORKSPACE}/*"
+                        git branch: "${RAMA}", credentialsId: 'ismael-github', url: "${REPO}"
+                    }
+                    catch (Exception e) {
+                        echo '[INFO] Dockers no encontrados en Producción.'
+                    }
+                    // finally {
+                    //     echo '[INFO] Se bajarán los dockers activos para levantar los nuevos'
+                    //     sh 'docker compose -f ./production/compose.yaml down'
+                    //     sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
+                    //     sh "cp /opt/jenkins/workspace/${WORKSPACE} /opt/jenkins/workspace/${WORKSPACE}-old"
+                    //     sh "rm -rf /opt/jenkins/workspace/${WORKSPACE}/*"
+                    //     git branch: "${RAMA}", credentialsId: 'ismael-github', url: "${REPO}"
+                    // }
+                }
+            }
+        }
 
         stage('Levantar Dockers Producción') {
             steps {
@@ -98,12 +107,13 @@ pipeline {
 
     post {
         success {
-            sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
+            // sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
+            sh "rm -rf /opt/jenkins/workspace/${WORKSPACE}-old"
             emailext attachLog: true, body: 'Logs adjuntados.', subject: "[SUCCESS] La ejecución de CI de ${RAMA} ha sido realizada con éxito.", to: "${EMAIL}"
         }
 
         failure {
-            sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
+            // sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
             emailext attachLog: true, body: 'Logs adjuntados.', subject: "[FAIL] La ejecución de CI de ${RAMA} ha fallado.", to: "${EMAIL}"
         }
     }
