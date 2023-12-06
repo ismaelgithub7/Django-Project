@@ -4,7 +4,7 @@ pipeline {
     }
     environment {
         REPO = 'git@github.com:ismaelgithub7/portfolio-DevOps.git'
-        RAMA = 'bugfix/logs-ejec'
+        RAMA = 'develop'
         WORKSPACE = '"django-project develop"'
         TIME_SLEEP = '10'
         EMAIL = 'ismaelfernandezmendezfp@gmail.com'
