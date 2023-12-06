@@ -48,7 +48,7 @@ pipeline {
                         sh 'docker compose -f ./production/compose.yaml up -d'
                         sh "sleep ${TIME_SLEEP}"
                     }
-                    catch (Exeception e){
+                    catch (Exception e){
                         echo 'Ha habido un problema al intentar levantar los dockers.'
                     }
                 }
