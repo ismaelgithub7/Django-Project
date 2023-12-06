@@ -16,7 +16,7 @@ services:
       - ./docker-data/postgres/:/docker-data/
       - ./db-postgres:/var/lib/postgresql/data
     command: /docker-data/postgres-init-production.sh
-  
+  asdawdaw
   django:
     container_name: django-production
     image: ifm7/django-gunicorn-production:latest
