@@ -54,7 +54,7 @@ pipeline {
                         echo '[INFO] Se bajarán los dockers activos para levantar los nuevos'
                         sh 'docker compose -f ./production/compose.yaml down'
                         sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
-                        sh "cp /opt/jenkins/workspace/${WORKSPACE} /opt/jenkins/workspace/${WORKSPACE}-old"
+                        sh "cp  -R /opt/jenkins/workspace/${WORKSPACE} /opt/jenkins/workspace/${WORKSPACE}-old"
                         sh "rm -rf /opt/jenkins/workspace/${WORKSPACE}/*"
                         git branch: "${RAMA}", credentialsId: 'ismael-github', url: "${REPO}"
                     }
@@ -108,12 +108,13 @@ pipeline {
     post {
         success {
             // sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
-            sh "rm -rf /opt/jenkins/workspace/${WORKSPACE}-old"
+            sh "if [ -d '/opt/jenkins/workspace/${WORKSPACE}-old' ]; then rm -rf /opt/jenkins/workspace/${WORKSPACE}-old; fi"
             emailext attachLog: true, body: 'Logs adjuntados.', subject: "[SUCCESS] La ejecución de CI de ${RAMA} ha sido realizada con éxito.", to: "${EMAIL}"
         }
 
         failure {
             // sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
+            sh "if [ -d '/opt/jenkins/workspace/${WORKSPACE}-old' ]; then rm -rf /opt/jenkins/workspace/${WORKSPACE}-old; fi"
             emailext attachLog: true, body: 'Logs adjuntados.', subject: "[FAIL] La ejecución de CI de ${RAMA} ha fallado.", to: "${EMAIL}"
         }
     }
