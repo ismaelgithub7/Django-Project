@@ -5,7 +5,7 @@ pipeline {
     environment {
         REPO = 'git@github.com:ismaelgithub7/portfolio-DevOps.git'
         RAMA = 'feature/jenkinsfile-cd'
-        WORKSPACE = '"django-project-production"'
+        WORKSPACE = 'django-project-production'
         TIME_SLEEP = '10'
         EMAIL = 'ismaelfernandezmendezfp@gmail.com'
     }
