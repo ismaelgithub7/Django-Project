@@ -5,11 +5,11 @@ pipeline {
     }
     environment {
     // variables que se utilizan en la ejecución de este pipeline:
-        REPO = 'git@github.com:ismaelgithub7/portfolio-DevOps.git'
+        REPO = 'git@github.com:ismaelgithub7/Django-Project.git'
         RAMA = 'develop'
         WORKSPACE = '"django-project develop"'
         TIME_SLEEP = '10'
-        EMAIL = 'ismaelfernandezmendezfp@gmail.com'
+        EMAIL = 'Example@gmail.com'
     }
     stages {
         stage('Clonar Repositorio/Rama') {
