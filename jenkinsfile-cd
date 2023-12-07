@@ -5,11 +5,11 @@ pipeline {
     }
     environment {
     // variables que se utilizan en la ejecución de este pipeline:
-        REPO = 'git@github.com:ismaelgithub7/portfolio-DevOps.git'
-        RAMA = 'feature/jenkinsfile-cd'
+        REPO = 'git@github.com:ismaelgithub7/Django-Project.git'
+        RAMA = 'production'
         WORKSPACE = 'django-project-production'
         TIME_SLEEP = '10'
-        EMAIL = 'ismaelfernandezmendezfp@gmail.com'
+        EMAIL = 'Example@gmail.com'
     }
     stages {
     // Se comprueba que el host en el que se ejecuta este pipeline tiene el software adecuado.
