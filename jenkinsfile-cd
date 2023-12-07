@@ -1,8 +1,10 @@
 pipeline {
     agent {
+    // se utiliza el nodo de pruebas de producción.
         label 'production'
     }
     environment {
+    // variables que se utilizan en la ejecución de este pipeline:
         REPO = 'git@github.com:ismaelgithub7/portfolio-DevOps.git'
         RAMA = 'feature/jenkinsfile-cd'
         WORKSPACE = 'django-project-production'
@@ -10,7 +12,7 @@ pipeline {
         EMAIL = 'ismaelfernandezmendezfp@gmail.com'
     }
     stages {
-
+    // Se comprueba que el host en el que se ejecuta este pipeline tiene el software adecuado.
         stage('Comprobar Software Necesario') {
             steps {
                 sh 'docker version > /dev/null'
@@ -19,6 +21,8 @@ pipeline {
         }
 
         stage('Comprobar Estado Dockers Ya en Producción') {
+        // Se comprueba si el proyecto esta desplegado ya en producción, si es así se guardan sus archivos en otra carpeta, 
+        // con el fin de si falla el despliege del nuevo proyecto recuperar el que ya estaba en funcionamiento. 
             steps {    
                 script {    
                     try {
@@ -26,7 +30,7 @@ pipeline {
                         sh 'docker exec postgres-alpine-production pwd'
                         sh 'docker exec django-production pwd'
                         sh 'docker exec nginx-alpine-production pwd'
-
+                        // si no se detectan lo siguiente no se realiza.
                         echo '[INFO] Se bajarán los dockers activos para levantar los nuevos'
                         sh 'docker compose -f ./production/compose.yaml down'
                         sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
@@ -42,6 +46,7 @@ pipeline {
         }
 
         stage('Levantar Dockers Producción') {
+        // se levanta el nuevo proyecto.
             steps {
                 script {
                     try {
@@ -56,6 +61,7 @@ pipeline {
         }
 
         stage('Comprobar Estado Dockers Acabados de Levantar') {
+        // se comprueba el estado de los dockers levantados, si tienen algún problema se recupera el que ya estaba en producción si es que lo había.
             steps {
                 script {
                     try {
@@ -63,7 +69,7 @@ pipeline {
                         sh 'docker exec postgres-alpine-production pwd'
                         sh 'docker exec django-production pwd'
                         sh 'docker exec nginx-alpine-production pwd'
-
+                        // si hay algún problema lo siguiente no se realiza.
                         echo '[SUCCESS] Dockers Nuevos Levantados con Éxito.'
                         sh "if [ -d '/opt/jenkins/workspace/${WORKSPACE}-old' ]; then rm -rf /opt/jenkins/workspace/${WORKSPACE}-old; else echo 'no existe'; fi"
                     }
@@ -82,6 +88,8 @@ pipeline {
     }
 
     post {
+    // Si se a creado una copia del projecto que ya existía se borra para dejar el workspace cpomo estaba antes de esta ejecución.
+    // Se envia un correo con el log de la ejecución.
         success {
             sh "if [ -d '/opt/jenkins/workspace/${WORKSPACE}-old' ]; then rm -rf /opt/jenkins/workspace/${WORKSPACE}-old; else echo 'no existe'; fi"
             emailext attachLog: true, body: 'Logs adjuntados.', subject: "[SUCCESS] La ejecución de CI de ${RAMA} ha sido realizada con éxito.", to: "${EMAIL}"
