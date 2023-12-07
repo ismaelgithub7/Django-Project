@@ -1,22 +1,26 @@
 pipeline {
     agent {
+    // se utiliza el nodo de pruebas de desarrollo.
         label 'develop'
     }
     environment {
-        REPO = 'git@github.com:ismaelgithub7/portfolio-DevOps.git'
+    // variables que se utilizan en la ejecución de este pipeline:
+        REPO = 'git@github.com:ismaelgithub7/Django-Project.git'
         RAMA = 'develop'
         WORKSPACE = '"django-project develop"'
         TIME_SLEEP = '10'
-        EMAIL = 'ismaelfernandezmendezfp@gmail.com'
+        EMAIL = 'Example@gmail.com'
     }
     stages {
         stage('Clonar Repositorio/Rama') {
+        // se clona la rama del repositorio correspondiente a develop.
             steps {
                 git branch: "${RAMA}", credentialsId: 'ismael-github', url: "${REPO}"
             }
         }
 
         stage('Comprobar Software Necesario') {
+        // Se comprueba que el host en el que se ejecuta este pipeline tiene el software adecuado.
             steps {
                 sh 'docker version > /dev/null'
                 sh 'docker compose version > /dev/null'
@@ -24,12 +28,14 @@ pipeline {
         }
 
         stage('Ejecutar Tests') {
+        // Se ejecutan los test unitarios de la aplicación.
             steps {
                 sh 'docker compose -f ./develop/compose-develop.yaml up -d'
                 sh "sleep 5"
                 sh 'docker exec django-develop python3 manage.py test'
             }
             post {
+            // se manejan los posibles fallos o el correcto resultado.
                 success {
                     echo '[SUCCESS] Tests Correctos' 
                     sh 'docker compose -f ./develop/compose-develop.yaml down'
@@ -42,6 +48,7 @@ pipeline {
         }
 
         stage('Levantar Dockers Producción') {
+        // Se levantan los docker de producción.
             steps {
                 sh 'docker compose -f ./production/compose.yaml up -d'
                 sh "sleep ${TIME_SLEEP}"
@@ -49,6 +56,7 @@ pipeline {
         }
 
         stage('Comprobar Estado Dockers Producción') {
+        // Se comprueba el estado del funcionamiento de los docker anteriormente levantados.
             steps {
                 sh 'curl -I http://localhost:80'
                 sh 'docker exec postgres-alpine-production pwd'
@@ -57,6 +65,8 @@ pipeline {
                 echo 'LOGS: '
             }
             post {
+            // se maneja un posible fallo de funcionamiento de los dockers.
+            // se miran los logs de los dockers para que queden registrados en e log de la ejecución.
                 success {
                     echo '[SUCCSESS] Dockers operativos y listos!!'
                     sh 'docker logs postgres-alpine-production'
@@ -76,6 +86,8 @@ pipeline {
     }
 
     post {
+    // Se cambian el propietario de los archivos de la palicaión para que Jenkins al volver a iniciar este proyecto pueda borrar el workspace.
+    // Se envia un correo con el log de la ejecución.
         success {
             sh "sudo chown -R jenkins /opt/jenkins/workspace/${WORKSPACE}"
             emailext attachLog: true, body: 'Logs adjuntados.', subject: "[SUCCESS] La ejecución de CI de ${RAMA} ha sido realizada con éxito.", to: "${EMAIL}"
